@@ -1,7 +1,8 @@
 /** Simulating call-by-reference using ([] array syntax) pointers */
 #include <stdio.h>
 
-void swap(int[] p, int[] q) {
+// NOTE: this does not work -- void swap(int[] p, int[] q) {
+void swap(int p[], int q[]) {
   int tmp = *p;
   *p = *q;
   *q = tmp;

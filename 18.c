@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 int main(int argc, char *argv[]) {
-  char *days[] = { "sun", "mon", "tue", "wed", "thu", "fri", sat" };
+  char *days[] = { "sun", "mon", "tue", "wed", "thu", "fri", "sat" };
 
   printf("This is an array of seven pointers to strings.\n");
   int i;

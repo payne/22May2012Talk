@@ -1,0 +1,676 @@
+nl 1.c
+     1	/** Pointers are very very very dangerous! */
+     2	// This is a silly demo.   Do not do this.
+      	
+     3	#include <stdio.h>
+      	
+     4	int main() {
+     5	  int a=1,b=2,c=3,d=4,e=5;
+      	
+     6	  long diff=(long) &a;
+     7	  diff -= (long) &e;
+     8	  printf("&a=%p &e=%p diff=%ld\n", &a, &e, diff);
+      	
+     9	  diff=(long) &b;
+    10	  diff -= (long) &c;
+    11	  printf("&b=%p &c=%p diff=%ld\n", &b, &c, diff);
+      	
+    12	  int *p;
+    13	  p=&e;
+    14	  int x;
+    15	  for (x=0; x < 5; ++x) {
+    16	    *p=100;
+    17	    p++;
+    18	  }
+      	
+    19	  printf("a=%d b=%d c=%d d=%d e=%d\n", a, b, c, d, e);
+      	
+    20	  return 0;
+    21	}
+cc 1.c
+./a.out
+&a=0x7fff5fbff284 &e=0x7fff5fbff274 diff=16
+&b=0x7fff5fbff280 &c=0x7fff5fbff27c diff=4
+a=100 b=100 c=100 d=100 e=100
+rm a.out
+nl 2.c
+     1	/** A pointer to an integer, and an integer */
+     2	#include <stdio.h>
+      	
+     3	int main() {
+     4	  int *p, q;
+     5	  p = &q; // p gets the address of q
+     6	  *p=42;  // The integer pointed to by p gets the value 42
+     7	  printf("q=%d p=%p &q=%p *p=%d\n", q,p,&q, *p);
+     8	  q=86; // *p referes to the same location as q
+     9	  printf("q=%d p=%p &q=%p *p=%d\n", q,p,&q, *p);
+    10	  return 0;
+    11	}
+    12	  
+cc 2.c
+./a.out
+q=42 p=0x7fff5fbff27c &q=0x7fff5fbff27c *p=42
+q=86 p=0x7fff5fbff27c &q=0x7fff5fbff27c *p=86
+rm a.out
+nl 3.c
+     1	/** You can take the address of a string */
+     2	#include <stdio.h>
+      	
+     3	int main() {
+     4	  char *p;
+      	
+     5	  p="I like eggs";
+     6	  printf("*p='%c'\n", *p);
+     7	  printf("p='%s'\n", p);
+     8	  return 0;
+     9	}
+    10	  
+cc 3.c
+./a.out
+*p='I'
+p='I like eggs'
+rm a.out
+nl 4.c
+     1	/** Simulating call-by-reference using pointers */
+     2	#include <stdio.h>
+      	
+     3	void swap(int *p, int *q) {
+     4	  int tmp = *p;
+     5	  *p = *q;
+     6	  *q = tmp;
+     7	}
+      	
+     8	int main() {
+     9	  int a=42, b=86;
+      	
+    10	  printf("a=%d b=%d\n", a,b);
+    11	  swap(&a,&b); 
+    12	  printf("a=%d b=%d\n", a,b);
+      	
+    13	  return 0;
+    14	}
+    15	  
+cc 4.c
+./a.out
+a=42 b=86
+a=86 b=42
+rm a.out
+nl 5.c
+     1	/** Simulating call-by-reference using (array[] syntax) pointers */
+     2	#include <stdio.h>
+      	
+     3	void swap(int p[], int q[]) {
+     4	  int tmp = *p;
+     5	  *p = *q;
+     6	  *q = tmp;
+     7	}
+      	
+     8	int main() {
+     9	  int a=42, b=86;
+      	
+    10	  printf("a=%d b=%d\n", a,b);
+    11	  swap(&a,&b); 
+    12	  printf("a=%d b=%d\n", a,b);
+      	
+    13	  return 0;
+    14	}
+    15	  
+cc 5.c
+./a.out
+a=42 b=86
+a=86 b=42
+rm a.out
+nl 6.c
+     1	/** Simulating call-by-reference using ([] array syntax) pointers */
+     2	#include <stdio.h>
+      	
+     3	// NOTE: this does not work -- void swap(int[] p, int[] q) {
+     4	void swap(int p[], int q[]) {
+     5	  int tmp = *p;
+     6	  *p = *q;
+     7	  *q = tmp;
+     8	}
+      	
+     9	int main() {
+    10	  int a=42, b=86;
+      	
+    11	  printf("a=%d b=%d\n", a,b);
+    12	  swap(&a,&b); 
+    13	  printf("a=%d b=%d\n", a,b);
+      	
+    14	  return 0;
+    15	}
+    16	  
+cc 6.c
+./a.out
+a=42 b=86
+a=86 b=42
+rm a.out
+nl 7.c
+     1	/** Taking the address of a function. */
+      	
+     2	#include <stdio.h>
+     3	#include <assert.h>
+      	
+     4	// http://stackoverflow.com/questions/840501/how-do-function-pointers-in-c-work
+      	
+     5	int addInt(int n, int m) {
+     6		return n+m;
+     7	}
+      	
+     8	int main() {
+      	
+     9		int (*functionPtr)(int,int);
+    10		
+    11		functionPtr=&addInt;
+      	
+    12		int sum=(*functionPtr)(2,3);
+    13		printf("sum=%d\n", sum);
+    14		assert(5==sum);
+      	
+    15		return 0;
+    16	}
+      	
+cc 7.c
+./a.out
+sum=5
+rm a.out
+nl 8.c
+     1	/** Associate right to left: (*p)++ vs *p++ */
+      	
+     2	#include <stdio.h>
+      	
+     3	long diff(int *x, int *y) {
+     4		long lx=(long)x;
+     5		long ly=(long)y;
+     6		return lx-ly;
+     7	}
+      	
+     8	int main() {
+     9		int a=1,b=2,c=3,d=4,e=5;
+    10		int *p, *pOld;
+      	
+    11		p=&a;
+    12		pOld=p;
+    13		int value = (*p)++;
+    14		printf("value=%d a=%d p=%p pOld=%p diff=%ld\n",
+    15			value,a,p,pOld,diff(p,pOld));
+      	
+    16		pOld=p;
+    17		value = *p++;
+    18		printf("value=%d a=%d p=%p pOld=%p diff=%ld\n",
+    19			value,a,p,pOld,diff(p,pOld));
+      	
+    20		return 0;
+    21	}
+cc 8.c
+./a.out
+value=1 a=2 p=0x7fff5fbff27c pOld=0x7fff5fbff27c diff=0
+value=2 a=2 p=0x7fff5fbff280 pOld=0x7fff5fbff27c diff=4
+rm a.out
+nl 9.c
+     1	/** Non-Constant pointer to non-constant data */
+      	
+     2	#include <stdio.h>
+      	
+     3	int main() {
+     4		int a=1,b=2,c=3;
+     5		int *p; // Non-constant pointer to non-constant data
+     6		p=&a;
+      	
+     7		int i;
+     8		for (i=0; i < 3; ++i) {
+     9			*p=100*(*p);
+    10			p++;
+    11		}
+    12		printf("a=%d, b=%d, c=%d\n", a,b,c);
+      	
+    13		return 0;
+    14	}
+cc 9.c
+./a.out
+a=100, b=2, c=3
+rm a.out
+nl 10.c
+     1	/** Non-constant pointer to constant integers; the integer at the location can not be changed. */
+      	
+     2	#include <stdio.h>
+      	
+     3	int main() {
+     4		int a=1,b=2,c=3;
+     5		const int *p; // Non-constant pointer to constant integers; the integer at the location can not be changed. 
+     6		p=&a;
+      	
+     7		int i;
+     8		for (i=0; i < 3; ++i) {
+     9			// *p=100*(*p);
+    10			printf("p=%p\n", p);
+    11			p++;
+    12		}
+    13		printf("a=%d, b=%d, c=%d\n", a,b,c);
+      	
+    14		return 0;
+    15	}
+cc 10.c
+./a.out
+p=0x7fff5fbff284
+p=0x7fff5fbff288
+p=0x7fff5fbff28c
+a=1, b=2, c=3
+rm a.out
+nl 11.c
+     1	/** Constant pointer to non-constant integer; the integer can be changed but the pointer can not be changed. */
+      	
+     2	#include <stdio.h>
+      	
+     3	int main() {
+     4		int a=1,b=2,c=3;
+     5		int * const p=&a; // Constant pointer to non-constant integer; the integer can be changed but the pointer can not be changed. */
+     6		// WHY does this not work??  
+     7		// p=&a;
+      	
+     8		int i;
+     9		for (i=0; i < 3; ++i) {
+    10			*p=100*(*p);
+    11			printf("p=%p\n", p);
+    12			//TRY THIS: 
+    13			//p++;
+    14		}
+    15		printf("a=%d, b=%d, c=%d\n", a,b,c);
+      	
+    16		return 0;
+    17	}
+cc 11.c
+./a.out
+p=0x7fff5fbff284
+p=0x7fff5fbff284
+p=0x7fff5fbff284
+a=1000000, b=2, c=3
+rm a.out
+nl 12.c
+     1	/** Neither the pointer nor the integer it points at can be changed. */
+      	
+      	
+     2	#include <stdio.h>
+      	
+     3	int main() {
+     4		int a=1,b=2,c=3;
+     5		// Neither the pointer nor the integer it points at can be changed. 
+     6		const int * const p=&a; 
+     7	  // WHY?
+     8	  //p=&a;
+      	
+     9		int i;
+    10		for (i=0; i < 3; ++i) {
+    11			//WHY?
+    12			//*p=100*(*p);
+    13			printf("p=%p\n", p);
+    14			// WHY?
+    15			//p++;
+    16		}
+    17		printf("a=%d, b=%d, c=%d\n", a,b,c);
+      	
+    18		return 0;
+    19	}
+cc 12.c
+./a.out
+p=0x7fff5fbff284
+p=0x7fff5fbff284
+p=0x7fff5fbff284
+a=1, b=2, c=3
+rm a.out
+nl 13.c
+     1	/** qsort demo.  RTFM: man qsort */
+      	
+     2	#include <stdio.h>
+     3	#include <stdlib.h>
+      	
+     4	int mycompare(const void *a, const void *b) {
+     5	  int *ai = (int *) a;
+     6	  int *bi = (int *) b;
+     7	  int aValue = (int)*ai;
+     8	  int bValue = (int)*bi;
+     9	  return aValue-bValue;
+    10	}
+      	
+    11	void printAray(int *p,int nel) {
+    12	  int i;
+    13	  for (i=0; i < nel; ++i) {
+    14	    printf("%d ", *p);
+    15	    p++;
+    16	  }
+    17	  printf("\n");
+    18	}
+      	
+    19	int main() {
+    20	  int aray[]={7,2,9};
+    21	  int nel = 3;
+    22	  qsort(aray,nel, sizeof(int), mycompare);
+    23	  printAray(aray,nel);
+    24	  return 0;
+    25	}
+cc 13.c
+./a.out
+2 7 9 
+rm a.out
+nl 14.c
+     1	/** Arrays/points in the command line */
+     2	#include <stdio.h>
+      	
+     3	int main(int argc, char *argv[]) {
+     4	  // Let's talk about argv!!
+      	
+     5	  int i;
+     6	  for (i=0; i < argc; i++) {
+     7	    printf("argv[%d]='%s'\n", i, argv[i]);
+     8	  }
+      	
+     9	  return 0;
+    10	}
+cc 14.c
+./a.out I like eggs "They are tasty"
+argv[0]='./a.out'
+argv[1]='I'
+argv[2]='like'
+argv[3]='eggs'
+argv[4]='They are tasty'
+rm a.out
+nl 15.c
+     1	/** Pointer arithmetic: p++ increases p by sizeof(*p) */
+      	
+     2	#include <stdio.h>
+      	
+     3	long diff(void *a, void *b) {
+     4		long al = (long) a;
+     5		long bl = (long) b;
+     6		return al - bl;
+     7	}
+      	
+     8	void voidDemo(void *p) {
+     9		void *pOld;
+    10		pOld=p;
+    11		p++;
+    12		printf("p=%p pOld=%p diff=%ld\n", p,pOld,diff(p,pOld));
+    13	}
+      	
+    14	void	charDemo() {
+    15		char *cp,*cpOld;
+    16		char c='A';
+    17		cp=&c;
+      	
+    18		voidDemo(cp);
+    19		cpOld=cp;
+    20		cp++;
+    21		printf("cp=%p cpOld=%p diff=%ld\n", cp,cpOld,diff(cp,cpOld));
+    22	}
+      	
+    23	void	shortDemo() {
+    24		short *sp,*spOld;
+    25		short s=42;
+    26		sp=&s;
+      	
+    27		voidDemo(sp);
+    28		spOld=sp;
+    29		sp++;
+    30		printf("sp=%p spOld=%p diff=%ld\n", sp,spOld,diff(sp,spOld));
+    31	}
+      	
+    32	void	intDemo() {
+    33		int *ip,*ipOld;
+    34		int i=42;
+    35		ip=&i;
+      	
+    36		voidDemo(ip);
+    37		ipOld=ip;
+    38		ip++;
+    39		printf("ip=%p ipOld=%p diff=%ld\n", ip,ipOld,diff(ip,ipOld));
+    40	}
+      	
+    41	void	longDemo() {
+    42		long *lp,*lpOld;
+    43		long l=42l;
+    44		lp=&l;
+      	
+    45		voidDemo(lp);
+    46		lpOld=lp;
+    47		lp++;
+    48		printf("lp=%p lpOld=%p diff=%ld\n", lp,lpOld,diff(lp,lpOld));
+    49	}
+      	
+    50	int main() {
+      	
+    51		charDemo();
+    52		shortDemo();
+    53		intDemo();
+    54		longDemo();
+      	
+    55		return 0;
+    56	}
+      	
+      	
+cc 15.c
+./a.out
+p=0x7fff5fbff260 pOld=0x7fff5fbff25f diff=1
+cp=0x7fff5fbff260 cpOld=0x7fff5fbff25f diff=1
+p=0x7fff5fbff25f pOld=0x7fff5fbff25e diff=1
+sp=0x7fff5fbff260 spOld=0x7fff5fbff25e diff=2
+p=0x7fff5fbff25d pOld=0x7fff5fbff25c diff=1
+ip=0x7fff5fbff260 ipOld=0x7fff5fbff25c diff=4
+p=0x7fff5fbff259 pOld=0x7fff5fbff258 diff=1
+lp=0x7fff5fbff260 lpOld=0x7fff5fbff258 diff=8
+rm a.out
+nl 16.c
+     1	/** Pointer arithmetic: p+6 is really p+(6*sizeof(*p)) */
+      	
+     2	#include <stdio.h>
+      	
+     3	long diff(void *a, void *b) {
+     4		long al = (long) a;
+     5		long bl = (long) b;
+     6		return al - bl;
+     7	}
+      	
+     8	void voidDemo(void *p) {
+     9		void *pOld;
+    10		pOld=p;
+    11		p+=6;
+    12		printf("p=%p pOld=%p diff=%ld\n", p,pOld,diff(p,pOld));
+    13	}
+      	
+    14	void	charDemo() {
+    15		char *cp,*cpOld;
+    16		char c='A';
+    17		cp=&c;
+      	
+    18		voidDemo(cp);
+    19		cpOld=cp;
+    20		cp+=6;
+    21		printf("cp=%p cpOld=%p diff=%ld\n", cp,cpOld,diff(cp,cpOld));
+    22	}
+      	
+    23	void	shortDemo() {
+    24		short *sp,*spOld;
+    25		short s=42;
+    26		sp=&s;
+      	
+    27		voidDemo(sp);
+    28		spOld=sp;
+    29		sp+=6;
+    30		printf("sp=%p spOld=%p diff=%ld\n", sp,spOld,diff(sp,spOld));
+    31	}
+      	
+    32	void	intDemo() {
+    33		int *ip,*ipOld;
+    34		int i=42;
+    35		ip=&i;
+      	
+    36		voidDemo(ip);
+    37		ipOld=ip;
+    38		ip+=6;
+    39		printf("ip=%p ipOld=%p diff=%ld\n", ip,ipOld,diff(ip,ipOld));
+    40	}
+      	
+    41	void	longDemo() {
+    42		long *lp,*lpOld;
+    43		long l=42l;
+    44		lp=&l;
+      	
+    45		voidDemo(lp);
+    46		lpOld=lp;
+    47		lp+=6;
+    48		printf("lp=%p lpOld=%p diff=%ld\n", lp,lpOld,diff(lp,lpOld));
+    49	}
+      	
+    50	int main() {
+      	
+    51		charDemo();
+    52		shortDemo();
+    53		intDemo();
+    54		longDemo();
+      	
+    55		return 0;
+    56	}
+      	
+      	
+cc 16.c
+./a.out
+p=0x7fff5fbff265 pOld=0x7fff5fbff25f diff=6
+cp=0x7fff5fbff265 cpOld=0x7fff5fbff25f diff=6
+p=0x7fff5fbff264 pOld=0x7fff5fbff25e diff=6
+sp=0x7fff5fbff26a spOld=0x7fff5fbff25e diff=12
+p=0x7fff5fbff262 pOld=0x7fff5fbff25c diff=6
+ip=0x7fff5fbff274 ipOld=0x7fff5fbff25c diff=24
+p=0x7fff5fbff25e pOld=0x7fff5fbff258 diff=6
+lp=0x7fff5fbff288 lpOld=0x7fff5fbff258 diff=48
+rm a.out
+nl 17.c
+     1	/** Pointer arithmetic: a[i] is really &a[0] + i * sizeof(a[0]) */
+     2	#include <stdio.h>
+     3	#include <assert.h>
+      	
+     4	// Why void?
+     5	int really(void *p, int i, int sz) {
+     6		void *pCalculated;
+     7		pCalculated = p + i*sz;
+     8		int *pi;
+     9		pi = (int*) pCalculated;
+    10		return *pi;
+    11	}
+      	
+    12	int main() {
+    13		int aRay[]={1,2,3,4,5}, len=5,i;
+    14		
+    15		for (i=0; i < len; ++i) {
+    16			printf("%d=aRay[%d]==really(&aRay[0],i,sizeof(aRay[0]))=%d\n",
+    17				aRay[i],i,really(&aRay[0],i,sizeof(aRay[0])));
+    18			assert(aRay[i]==really(&aRay[0],i,sizeof(aRay[0])));
+    19		}
+      	
+    20		return 0;
+    21	}
+      	
+      	
+cc 17.c
+./a.out
+1=aRay[0]==really(&aRay[0],i,sizeof(aRay[0]))=1
+2=aRay[1]==really(&aRay[0],i,sizeof(aRay[0]))=2
+3=aRay[2]==really(&aRay[0],i,sizeof(aRay[0]))=3
+4=aRay[3]==really(&aRay[0],i,sizeof(aRay[0]))=4
+5=aRay[4]==really(&aRay[0],i,sizeof(aRay[0]))=5
+rm a.out
+nl 18.c
+     1	/** Arrays of pointers */
+     2	#include <stdio.h>
+      	
+     3	int main(int argc, char *argv[]) {
+     4	  char *days[] = { "sun", "mon", "tue", "wed", "thu", "fri", "sat" };
+      	
+     5	  printf("This is an array of seven pointers to strings.\n");
+     6	  int i;
+     7	  for (i=0; i < 7; ++i) {
+     8	    printf("\t%s\n", days[i]);
+     9	  }
+    10	  return 0;
+    11	}
+cc 18.c
+./a.out
+This is an array of seven pointers to strings.
+	sun
+	mon
+	tue
+	wed
+	thu
+	fri
+	sat
+rm a.out
+nl 19.c
+     1	/** Pointers to functions: Can call through the pointer to the function. */
+     2	#include <stdio.h>
+     3	#include <stdio.h>
+     4	#include <assert.h>
+      	
+     5	// http://stackoverflow.com/questions/840501/how-do-function-pointers-in-c-work
+      	
+     6	int addInt(int n, int m) {
+     7		return n+m;
+     8	}
+      	
+     9	int main() {
+      	
+    10		int (*functionPtr)(int,int);
+    11		
+    12		functionPtr=&addInt;
+      	
+    13		int sum=(*functionPtr)(2,3);
+    14		printf("sum=%d\n", sum);
+    15		assert(5==sum);
+      	
+    16		return 0;
+    17	}
+      	
+cc 19.c
+./a.out
+sum=5
+rm a.out
+nl 20.c
+     1	/** Preview of comming attractions! */
+     2	#include <stdio.h>
+      	
+     3	int main(int argc, char *argv[]) {
+     4	  int *ptr = malloc(200);
+     5	  // Dynamic allocation -- What's it really good for?
+     6	  free(ptr);
+     7	  return 0;
+     8	}
+cc 20.c
+./a.out
+rm a.out
+nl q1.c
+     1	/** What's wrong with this code? */
+      	
+     2	#include <stdio.h>
+      	
+     3	int add_it(int a[ ] ) {
+     4	  int result=0;
+     5	  int i;
+     6	  for (i=0; i < sizeof(a) / sizeof(a[0]); i++) {
+     7	    printf("a[%d]=%d\n", i, a[i]);  
+     8	    result += a[i];
+     9	  }
+    10	  return result;
+    11	}
+      	
+    12	int main() {
+    13	  int aray[]={4,5,6};
+    14	  int sum=add_it(aray);
+      	
+    15	  printf("sum=%d\n", sum);
+    16	  return 0;
+    17	}
+    18	  
+cc q1.c
+./a.out
+a[0]=4
+a[1]=5
+sum=9
+rm a.out

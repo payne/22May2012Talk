@@ -6,7 +6,14 @@
 int main() {
   int a=1,b=2,c=3,d=4,e=5;
 
-  printf("&a=%p &e=%p\n", &a, &e);
+  long diff=(long) &a;
+  diff -= (long) &e;
+  printf("&a=%p &e=%p diff=%ld\n", &a, &e, diff);
+
+  diff=(long) &b;
+  diff -= (long) &c;
+  printf("&b=%p &c=%p diff=%ld\n", &b, &c, diff);
+
   int *p;
   p=&e;
   int x;
