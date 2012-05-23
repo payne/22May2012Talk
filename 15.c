@@ -1,4 +1,7 @@
-/** Pointer arithmetic: p++ increases p by sizeof(*p) */
+/** Pointer arithmetic: p++ increases p by sizeof(*p) 
+aka the size of the base type
+int *p -- base type is int
+*/
 
 #include <stdio.h>
 
@@ -12,7 +15,8 @@ void voidDemo(void *p) {
 	void *pOld;
 	pOld=p;
 	p++;
-	printf("p=%p pOld=%p diff=%ld\n", p,pOld,diff(p,pOld));
+	printf("voidDemo: %3s=%p %6s=%p diff=%ld\n", 
+										"p", p,"pOld",pOld,diff(p,pOld));
 }
 
 void	charDemo() {
@@ -23,7 +27,8 @@ void	charDemo() {
 	voidDemo(cp);
 	cpOld=cp;
 	cp++;
-	printf("cp=%p cpOld=%p diff=%ld\n", cp,cpOld,diff(cp,cpOld));
+	printf("charDemo: %3s=%p %6s=%p diff=%ld\n", 
+										"cp", cp,"cpOld",cpOld,diff(cp,cpOld));
 }
 
 void	shortDemo() {
@@ -34,7 +39,10 @@ void	shortDemo() {
 	voidDemo(sp);
 	spOld=sp;
 	sp++;
-	printf("sp=%p spOld=%p diff=%ld\n", sp,spOld,diff(sp,spOld));
+	printf("shortDemo: %3s=%p %6s=%p diff=%ld sizeof(short)=%d\n", 
+										"sp", sp,"spOld",spOld,diff(sp,spOld),sizeof(short));
+	printf("QUESTION: Why is the address one off from the void demo here?\n");
+	printf("ANSWER: points must align with their underlying type... short every two bytes (on vulcan), int every four bytes (on vulcan), and so on.\n");
 }
 
 void	intDemo() {
@@ -45,7 +53,8 @@ void	intDemo() {
 	voidDemo(ip);
 	ipOld=ip;
 	ip++;
-	printf("ip=%p ipOld=%p diff=%ld\n", ip,ipOld,diff(ip,ipOld));
+	printf("intDemo: %3s=%p %6s=%p diff=%ld sizeof(short)=%d\n", 
+										"ip", ip,"ipOld",ipOld,diff(ip,ipOld),sizeof(int));
 }
 
 void	longDemo() {

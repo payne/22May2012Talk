@@ -7,6 +7,7 @@ int main() {
   p="I like eggs";
   printf("*p='%c'\n", *p);
   printf("p='%s'\n", p);
+  printf("p='%s'\n", p+2);
   return 0;
 }
   

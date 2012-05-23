@@ -9,7 +9,7 @@ int main() {
 
 	int i;
 	for (i=0; i < 3; ++i) {
-		// *p=100*(*p);
+		//*p=100*(*p);
 		printf("p=%p\n", p);
 		p++;
 	}

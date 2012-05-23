@@ -11,7 +11,7 @@ int main() {
 	int i;
 	for (i=0; i < 3; ++i) {
 		*p=100*(*p);
-		printf("p=%p\n", p);
+		printf("p=%p *p=%d\n", p,*p);
 		//TRY THIS: 
 		//p++;
 	}

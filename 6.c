@@ -3,6 +3,7 @@
 
 // NOTE: this does not work -- void swap(int[] p, int[] q) {
 void swap(int p[], int q[]) {
+	//int[] demop; // BAD SYNTAX!
   int tmp = *p;
   *p = *q;
   *q = tmp;

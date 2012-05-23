@@ -1,4 +1,8 @@
 /** Pointer arithmetic: a[i] is really &a[0] + i * sizeof(a[0]) */
+// Or &a[0] + i * sizeof(base data type)
+// In other words ----
+// In all C compilers
+// Arrays are ALWAYS contiguous in MEMORY
 #include <stdio.h>
 #include <assert.h>
 

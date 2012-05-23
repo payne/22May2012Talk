@@ -11,7 +11,7 @@ int main() {
   int a=42, b=86;
 
   printf("a=%d b=%d\n", a,b);
-  swap(&a,&b); 
+  swap(&a,&b); // The address of a becomes a pointer to a.... etc.
   printf("a=%d b=%d\n", a,b);
 
   return 0;
